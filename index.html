@@ -81,6 +81,17 @@
 
 	<hr />
 
+	<h2>Shogunate Count</h2>
+
+	<p>Kamakura: <span id="Kamakura"></span></p>
+	<p>Muromachi: <span id="Muromachi"></span></p>
+	<p>Edo: <span id="Edo"></span></p>
+	<p>Oda: <span id="Oda"></span></p>
+	<p>Imperial: <span id="Imperial"></span></p>
+	<button id="ShogunateCount" onclick="ShogunateCount()">ShogunateCount</button>
+
+	<hr />
+
 
 	<br />
 
@@ -106,7 +117,11 @@
 		var purchase_number;
 		var shogunate_name;
 		var address;
-
+		var Kamakura = 0;
+		var Muromachi = 0;
+		var Edo = 0;
+		var Oda = 0;
+		var Imperial = 0;
 
 		async function printPostsToConsole() {
 
@@ -302,8 +317,57 @@
 				to: contract_address,
 				data: myContract.methods.tokensOfOwner(address).encodeABI()
 			}).then(function (result){
-				console.log(result);
+				for (var i = 0; i < (result.length - 130) / 64; i++){
+					console.log(parseInt(result.substr(130 + 64 * i, 64), 16))
+				}				
 			});
+		}
+
+		async function ShogunateCount() {
+
+			ShogunateName = ["Kamakura S", "Kamakura M", "Kamakura L", "Kamakura XL", "Muromachi S", "Muromachi M", "Muromachi L", "Muromachi XL", "Edo S", "Edo M", "Edo L", "Edo XL",
+							"Oda S", "Oda M", "Oda L", "Oda XL", "Imperial S", "Imperial M", "Imperial L", "Imperial XL"]
+
+
+			for (i = 0; i < ShogunateName.length; i++){
+
+				shogunate = await web3.eth.call({
+					to: contract_address,
+					data: myContract.methods.shogunateQuantity(ShogunateName[i]).encodeABI()
+				}).then(function (result){
+					shogunate_result = parseInt(result, 16);
+					console.log(shogunate_result)
+					if (i < 4){
+						Kamakura = Kamakura + shogunate_result;
+					}
+					if (3 < i){
+						if (i < 8){
+							Muromachi = Muromachi + shogunate_result;
+						}	
+					}
+					if (7 < i){
+						if (i < 12){
+							Edo = Edo + shogunate_result;
+						} 	
+					}
+					if (12 < i){
+						if (i < 16){
+							Oda = Oda + shogunate_result;
+						} 	
+					}
+					if (15 < i){
+						if (i < 20){
+							Imperial = Imperial + shogunate_result;
+						} 	
+					}
+				});
+			}
+
+			$("#Kamakura").text(Kamakura);
+			$("#Muromachi").text(Muromachi);
+			$("#Edo").text(Edo);
+			$("#Oda").text(Oda);
+			$("#Imperial").text(Imperial);
 		}
 
 	</script>
